@@ -10,6 +10,7 @@ const initialHabits = [
 
 export default function Home() {
   const [habits, setHabits] = useState(initialHabits);
+  const [newHabit, setNewHabit] = useState("");
 
   const updateHabitName = (id: number, newName: string) => {
     setHabits(
@@ -23,9 +24,37 @@ export default function Home() {
     setHabits(habits.filter((habit) => habit.id !== id));
   };
 
+  const addHabit = () => {
+    if (newHabit.trim() === "") return; //prevents empty habits
+    const newHabitObj = { id: Date.now(), name: newHabit, completed: false };
+    setHabits([...habits, newHabitObj]);
+    setNewHabit(""); //clear input after adding
+  };
+
   return (
     <main className="min-h-screen flex flex-col items-center bg-gray-100 p-6">
       <h1 className="text-3x1 font-bold mb-6">Current Habits</h1>
+
+      {/*input field for new habit */}
+      <div className="flex space-x-2 mb-6">
+        <input
+          type="text"
+          value={newHabit}
+          onChange={(e) => {
+            setNewHabit(e.target.value);
+          }}
+          placeholder="Enter new habit.."
+          className="border p-2 rounded-md w-full"
+        />
+        <button
+          onClick={addHabit}
+          className="bg-blue-500 text-white px-4 py-2 rounded-md"
+        >
+          Add
+        </button>
+      </div>
+
+      {/* habit list*/}
       <div className="w-full max-w-md space-y-4">
         {habits.map((habit) => (
           <Habit
