@@ -24,22 +24,30 @@ export default function Home() {
   }, [habits]);
 
   const updateHabitName = (id: number, newName: string) => {
-    setHabits(
-      habits.map((habit) =>
+    setHabits((prevHabits) =>
+      prevHabits.map((habit) =>
         habit.id === id ? { ...habit, name: newName } : habit
       )
     );
   };
 
   const deleteHabit = (id: number) => {
-    setHabits(habits.filter((habit) => habit.id !== id));
+    setHabits((prevHabits) => prevHabits.filter((habit) => habit.id !== id));
+  };
+
+  const toggleHabitComplete = (id: number) => {
+    setHabits((prevHabits) =>
+      prevHabits.map((habit) =>
+        habit.id === id ? { ...habit, completed: !habit.completed } : habit
+      )
+    );
   };
 
   const addHabit = () => {
-    if (newHabit.trim() === "") return; //prevents empty habits
+    if (newHabit.trim() === "") return;
     const newHabitObj = { id: Date.now(), name: newHabit, completed: false };
-    setHabits([...habits, newHabitObj]);
-    setNewHabit(""); //clear input after adding
+    setHabits((prevHabits) => [...prevHabits, newHabitObj]);
+    setNewHabit("");
   };
 
   return (
@@ -66,7 +74,7 @@ export default function Home() {
       </div>
 
       {/* habit list*/}
-      <div className="w-full max-w-md space-y-4">
+      <div className="w-full max-w-md space-y-4 text-black">
         {habits.map((habit) => (
           <Habit
             key={habit.id}
@@ -74,6 +82,7 @@ export default function Home() {
             completed={habit.completed}
             onUpdate={(newName) => updateHabitName(habit.id, newName)}
             onDelete={() => deleteHabit(habit.id)}
+            onToggleComplete={() => toggleHabitComplete(habit.id)}
           />
         ))}
       </div>

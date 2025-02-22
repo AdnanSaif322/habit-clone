@@ -5,59 +5,58 @@ interface HabitProps {
   completed: boolean;
   onUpdate: (newName: string) => void;
   onDelete: () => void;
+  onToggleComplete: () => void;
 }
 const Habit: React.FC<HabitProps> = ({
   name,
   completed,
   onUpdate,
   onDelete,
+  onToggleComplete,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [newName, setNewName] = useState(name);
-
-  const handleSave = () => {
-    onUpdate(newName);
-    setIsEditing(false);
-  };
+  const [editName, setEditName] = useState(name);
 
   return (
     <div className="flex item-center justify-between p-4 border rounded-lg shadow-sm bg-white">
+      {/*Checkbox to Mark as complete */}
+      <input
+        type="checkbox"
+        checked={completed}
+        onChange={onToggleComplete}
+        className="mr-2"
+      />
+
+      {/*Editable Habit Name */}
       {isEditing ? (
         <input
           type="text"
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
+          value={editName}
+          onChange={(e) => setEditName(e.target.value)}
+          onBlur={() => {
+            onUpdate(editName);
+            setIsEditing(false);
+          }}
           className="border p-1 rounded-md w-full"
         />
       ) : (
         <span
-          className={`text-lg ${
-            completed ? "line-through text-gray-500" : "text-gray-900"
+          onClick={() => setIsEditing(true)}
+          className={`cursor-pointer ${
+            completed ? "line-through text-black-500" : ""
           }`}
         >
           {name}
         </span>
       )}
-      <div className="flex item-center space-x-2">
-        {isEditing ? (
-          <button onClick={handleSave} className="text-green-500 text-sm">
-            Save
-          </button>
-        ) : (
-          <>
-            <button
-              onClick={() => setIsEditing(true)}
-              className="text-blue-500 text-sm"
-            >
-              Edit
-            </button>
-            <button onClick={onDelete} className="text-red-500">
-              Delete
-            </button>
-          </>
-        )}
-      </div>
-      <input type="checkbox" checked={completed} className="w-5 h-5" />
+
+      {/*Delete Button */}
+      <button
+        onClick={onDelete}
+        className="bg-red-600 text-white px-2 py-1 rounded-md ml-2"
+      >
+        Delete
+      </button>
     </div>
   );
 };
