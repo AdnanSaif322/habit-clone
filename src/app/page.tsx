@@ -19,6 +19,10 @@ export default function Home() {
     );
   };
 
+  const deleteHabit = (id: number) => {
+    setHabits(habits.filter((habit) => habit.id !== id));
+  };
+
   return (
     <main className="min-h-screen flex flex-col items-center bg-gray-100 p-6">
       <h1 className="text-3x1 font-bold mb-6">Current Habits</h1>
@@ -29,6 +33,7 @@ export default function Home() {
             name={habit.name}
             completed={habit.completed}
             onUpdate={(newName) => updateHabitName(habit.id, newName)}
+            onDelete={() => deleteHabit(habit.id)}
           />
         ))}
       </div>

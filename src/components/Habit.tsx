@@ -4,8 +4,14 @@ interface HabitProps {
   name: string;
   completed: boolean;
   onUpdate: (newName: string) => void;
+  onDelete: () => void;
 }
-const Habit: React.FC<HabitProps> = ({ name, completed, onUpdate }) => {
+const Habit: React.FC<HabitProps> = ({
+  name,
+  completed,
+  onUpdate,
+  onDelete,
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState(name);
 
@@ -38,12 +44,17 @@ const Habit: React.FC<HabitProps> = ({ name, completed, onUpdate }) => {
             Save
           </button>
         ) : (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="text-blue-500 text-sm"
-          >
-            Edit
-          </button>
+          <>
+            <button
+              onClick={() => setIsEditing(true)}
+              className="text-blue-500 text-sm"
+            >
+              Edit
+            </button>
+            <button onClick={onDelete} className="text-red-500">
+              Delete
+            </button>
+          </>
         )}
       </div>
       <input type="checkbox" checked={completed} className="w-5 h-5" />
