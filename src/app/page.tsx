@@ -1,16 +1,27 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Habit from "@/components/Habit";
 
-const initialHabits = [
-  { id: 1, name: "code Habit Clone", completed: false },
-  { id: 2, name: "Update Wallet App", completed: true },
-  { id: 3, name: "Stream", completed: false },
-];
+const STORAGE_KEY = "habitkit-habits";
 
 export default function Home() {
-  const [habits, setHabits] = useState(initialHabits);
+  const [habits, setHabits] = useState<
+    { id: number; name: string; completed: boolean }[]
+  >([]);
   const [newHabit, setNewHabit] = useState("");
+
+  //Load habits from local storage when the page loads
+  useEffect(() => {
+    const storedHabits = localStorage.getItem(STORAGE_KEY);
+    if (storedHabits) {
+      setHabits(JSON.parse(storedHabits));
+    }
+  }, []);
+
+  //save habits to local storage whenever they change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(habits));
+  }, [habits]);
 
   const updateHabitName = (id: number, newName: string) => {
     setHabits(
@@ -44,7 +55,7 @@ export default function Home() {
             setNewHabit(e.target.value);
           }}
           placeholder="Enter new habit.."
-          className="border p-2 rounded-md w-full"
+          className="border p-2 rounded-md w-full text-black"
         />
         <button
           onClick={addHabit}
