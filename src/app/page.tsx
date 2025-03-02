@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { HabitType } from "@/types/habit";
 import Habit from "@/components/Habit";
+import HabitModal from "@/components/HabitModal";
 
 const STORAGE_KEY = "habitkit-habits";
 
@@ -32,6 +33,8 @@ const initialHabits: HabitType[] = [
 export default function Home() {
   const [habits, setHabits] = useState<HabitType[]>([]);
   const [newHabit, setNewHabit] = useState("");
+  const [selectedHabit, setSelectedHabit] = useState<HabitType | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const storedHabits = localStorage.getItem(STORAGE_KEY);
@@ -96,8 +99,18 @@ export default function Home() {
     );
   };
 
+  const openModalForHabit = (habit: HabitType) => {
+    setSelectedHabit(habit);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setSelectedHabit(null);
+    setIsModalOpen(false);
+  };
+
   return (
-    <main className="min-h-screen flex flex-col items-center bg-gray-100 p-6">
+    <main className="min-h-screen flex flex-col items-center bg-gray-100 p-6 dark:bg-gray-900 dark:text-gray-100">
       <h1 className="text-3xl font-bold mb-6">My Habits</h1>
       <div className="flex space-x-2 mb-6 w-full max-w-md">
         <input
@@ -117,17 +130,37 @@ export default function Home() {
 
       <div className="w-full max-w-md space-y-4">
         {habits.map((habit) => (
-          <Habit
-            key={habit.id}
-            name={habit.name}
-            completed={habit.completed}
-            completions={habit.completions}
-            onUpdate={(newName) => updateHabitName(habit.id, newName)}
-            onDelete={() => deleteHabit(habit.id)}
-            onToggleDay={(dateStr) => toggleHabitCompletion(habit.id, dateStr)}
-          />
+          <div key={habit.id} onDoubleClick={() => openModalForHabit(habit)}>
+            <Habit
+              name={habit.name}
+              completed={habit.completed}
+              completions={habit.completions}
+              onUpdate={(newName) => updateHabitName(habit.id, newName)}
+              onDelete={() => deleteHabit(habit.id)}
+              onToggleDay={(dateStr) =>
+                toggleHabitCompletion(habit.id, dateStr)
+              }
+            />
+          </div>
         ))}
       </div>
+
+      {/* Modal for Habit Details */}
+      {selectedHabit && (
+        <HabitModal
+          habitName={selectedHabit.name}
+          isOpen={isModalOpen}
+          onClose={closeModal}
+        >
+          {/* You can place a larger HabitGrid or additional details here */}
+          <p className="mb-4">
+            Here is a detailed view of your habit's progress:
+          </p>
+          <div>
+            {/* Optionally reuse HabitGrid component for a larger view */}
+          </div>
+        </HabitModal>
+      )}
     </main>
   );
 }
