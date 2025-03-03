@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { HabitType } from "@/types/habit";
 import Habit from "@/components/Habit";
 import HabitModal from "@/components/HabitModal";
+import HabitGrid from "@/components/HabitGrid";
 
 const STORAGE_KEY = "habitkit-habits";
 
@@ -109,6 +110,11 @@ export default function Home() {
     setIsModalOpen(false);
   };
 
+  const sortedHabits = habits.slice().sort((a, b) => {
+    if (a.completed === b.completed) return 0;
+    return a.completed ? 1 : -1;
+  });
+
   return (
     <main className="min-h-screen flex flex-col items-center bg-gray-100 p-6 dark:bg-gray-900 dark:text-gray-100">
       <h1 className="text-3xl font-bold mb-6">My Habits</h1>
@@ -118,7 +124,7 @@ export default function Home() {
           value={newHabit}
           onChange={(e) => setNewHabit(e.target.value)}
           placeholder="Enter a new habit..."
-          className="border p-2 rounded-md w-full"
+          className="border p-2 rounded-md w-full text-black"
         />
         <button
           onClick={addHabit}
@@ -128,8 +134,8 @@ export default function Home() {
         </button>
       </div>
 
-      <div className="w-full max-w-md space-y-4">
-        {habits.map((habit) => (
+      <div className="w-full max-w-md space-y-4 text-black">
+        {sortedHabits.map((habit) => (
           <div key={habit.id} onDoubleClick={() => openModalForHabit(habit)}>
             <Habit
               name={habit.name}
@@ -152,13 +158,22 @@ export default function Home() {
           isOpen={isModalOpen}
           onClose={closeModal}
         >
-          {/* You can place a larger HabitGrid or additional details here */}
-          <p className="mb-4">
-            Here is a detailed view of your habit's progress:
-          </p>
-          <div>
-            {/* Optionally reuse HabitGrid component for a larger view */}
-          </div>
+          <p className="mb-4">Detailed progress for {selectedHabit.name}</p>
+          <HabitGrid
+            completions={selectedHabit.completions}
+            onToggleDay={(dateStr) => {
+              //Toggle completion for the habit in the modal view
+              toggleHabitCompletion(selectedHabit.id, dateStr);
+              //optional:update selectedHabit to reflect chages immediately
+              setSelectedHabit({
+                ...selectedHabit,
+                completions: {
+                  ...selectedHabit.completions,
+                  [dateStr]: !selectedHabit.completions[dateStr],
+                },
+              });
+            }}
+          />
         </HabitModal>
       )}
     </main>
